@@ -1,4 +1,4 @@
-package com.app.ecom;
+package com.app.ecom.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.app.ecom.models.User;
+import com.app.ecom.services.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -59,9 +62,9 @@ public class UserController {
 	
 	
 	@PostMapping
-	public ResponseEntity<List<User>> createUser(@RequestBody User user){
+	public void createUser(@RequestBody User user){
 		//userList.add(user);
-		return ResponseEntity.ok(userservice.createUser(user));
+	       userservice.createUser(user);
 		
 		
 	}
@@ -69,7 +72,7 @@ public class UserController {
 	@PutMapping("/update/{id}")
 	 public ResponseEntity<User> updateUser(@PathVariable Long id,@RequestBody User newUser){
 				  
-         String Message = userservice.updateUser(id, newUser);
+         Boolean Message = userservice.updateUser(id, newUser);
 		 return ResponseEntity.ok().build(); 
 		 
 	 }
