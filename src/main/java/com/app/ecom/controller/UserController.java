@@ -1,13 +1,7 @@
 package com.app.ecom.controller;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.RequestEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app.ecom.models.User;
+import com.app.ecom.dto.UserRequest;
+import com.app.ecom.dto.UserResponse;
 import com.app.ecom.services.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,7 +32,7 @@ public class UserController {
 	private final UserService userservice;
 	
 	@GetMapping
-	 public ResponseEntity<List<User>> getAllUsers(){
+	 public ResponseEntity<List<UserResponse>> getAllUsers(){
 		   
 		  return ResponseEntity.ok(userservice.getAllUsers());
 		 
@@ -45,7 +40,7 @@ public class UserController {
 	 }
 	
 	@GetMapping("/{id}")
-	 public ResponseEntity<User> getUser(@PathVariable Long id){
+	 public ResponseEntity<UserResponse> getUser(@PathVariable Long id){
 		//Optional<User> user = userservice.getUser(id);
 		/*
 		 * if(user == null) { //return ResponseEntity.notFound().build(); return
@@ -62,18 +57,23 @@ public class UserController {
 	
 	
 	@PostMapping
-	public void createUser(@RequestBody User user){
+	public ResponseEntity<String> createUser(@RequestBody UserRequest userRequest){
 		//userList.add(user);
-	       userservice.createUser(user);
+	       userservice.createUser(userRequest);
+	       return ResponseEntity.ok("User added successfull");
 		
 		
 	}
 	
 	@PutMapping("/update/{id}")
-	 public ResponseEntity<User> updateUser(@PathVariable Long id,@RequestBody User newUser){
+	 public ResponseEntity<String> updateUser(@PathVariable Long id,@RequestBody UserRequest userRequest){
 				  
-         Boolean Message = userservice.updateUser(id, newUser);
-		 return ResponseEntity.ok().build(); 
+         Boolean Message = userservice.updateUser(id, userRequest);
+         if(Message) {
+        	   return ResponseEntity.ok("User updated successfully");
+        			   
+         }
+		 return ResponseEntity.notFound().build();
 		 
 	 }
 	

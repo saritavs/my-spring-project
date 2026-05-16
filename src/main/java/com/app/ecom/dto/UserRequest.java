@@ -10,7 +10,7 @@ public class UserRequest {
 	
 	private String email;
 	private String phoneNum;
-	private AdressDto adress;
+	private AdressDto address;
 	
 
 }

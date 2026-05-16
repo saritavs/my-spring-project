@@ -1,15 +1,15 @@
 package com.app.ecom.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import javax.print.attribute.standard.MediaSize.Other;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.app.ecom.dto.AdressDto;
+import com.app.ecom.dto.UserRequest;
 import com.app.ecom.dto.UserResponse;
+import com.app.ecom.models.Addresses;
 import com.app.ecom.models.User;
 import com.app.ecom.repositories.UserRepositories;
 
@@ -18,8 +18,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-	private Long id = 1l;
-	
 	//private List<User> userList = new ArrayList<User>();
 	private final UserRepositories userRepo;
 
@@ -31,7 +29,10 @@ public class UserService {
 	 * 
 	 */
 	public List<UserResponse> getAllUsers(){ 
-		return userRepo.findAll();
+		
+		return userRepo.findAll().stream()
+				.map(this::mapToUserReponse)
+				.collect(Collectors.toList());
 	
 	
 	}
@@ -40,12 +41,14 @@ public class UserService {
 	 * userList.add(user); return userList; }
 	 */
 	
-	 public void createUser(User user){
+	 public void createUser(UserRequest userRequest){
+		 User user = new User();
+		 updateUserFromRequest(user,userRequest);
 		 userRepo.save(user);
 		 
 	 }
 		
-		public Boolean updateUser(Long Id,User newUser){
+		public Boolean updateUser(Long Id,UserRequest userRequest){
 			/*
 			 * userList.stream() .filter(user -> user.getId().equals(Id)) .findFirst()
 			 * .ifPresent(user ->{ user.setFirstName(newUser.getFirstName());
@@ -55,18 +58,19 @@ public class UserService {
 			 */
 			
 			return userRepo.findById(Id)
-					.map(exisitinguser ->{
-				     exisitinguser.setFirstName(newUser.getFirstName());
-				     exisitinguser.setLastName(newUser.getLastName());
+					.map(exisitinguser -> {
+				     updateUserFromRequest(exisitinguser, userRequest);
 				     userRepo.save(exisitinguser);
 				     return true;
 				
 			}).orElse(false);
 			
+										
 		}
 		
-		public Optional<User> getUser(Long Id) {
-			return userRepo.findById(Id);
+		public Optional<UserResponse> getUser(Long Id) {
+			return userRepo.findById(Id)
+					.map(this::mapToUserReponse);
 			
 			/*
 			 * return userList.stream() .filter(user -> user.getId().equals(Id))
@@ -103,5 +107,25 @@ public class UserService {
 			
 		}
 	 
-	 
+		
+		private void updateUserFromRequest(User user, UserRequest request) {
+			user.setFirstName(request.getFirstName());
+			user.setLastName(request.getLastName());
+			user.setEmail(request.getEmail());
+			user.setPhoneNum(request.getPhoneNum());
+			
+			if(request.getAddress()!= null) {
+				Addresses address = new Addresses();
+				address.setCity(request.getAddress().getCity());
+				address.setCity(request.getAddress().getCountry());
+				address.setState(request.getAddress().getState());
+				address.setStreet(request.getAddress().getStreet());
+				address.setZipcode(request.getAddress().getZipcode());
+				
+				user.setAddress(address);
+						
+			}
+		}
+
+		
 }
